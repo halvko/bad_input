@@ -19,6 +19,10 @@ impl<R: Read> BadInput<R> {
         self.try_read_line().unwrap()
     }
 
+    pub fn lines<'a>(&'a mut self) -> impl Iterator<Item = InputString> + 'a {
+        Lines { input: self }
+    }
+
     pub fn try_read_line(&mut self) -> Option<InputString> {
         self.try_read_to_byte(b'\n')
             .and_then(|e| e.ok())
@@ -119,5 +123,17 @@ impl Into<String> for InputString {
 impl From<String> for InputString {
     fn from(inner: String) -> Self {
         Self { inner }
+    }
+}
+
+struct Lines<'a, R: Read> {
+    input: &'a mut BadInput<R>,
+}
+
+impl<'a, R: Read> Iterator for Lines<'a, R> {
+    type Item = InputString;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.input.try_read_line()
     }
 }
