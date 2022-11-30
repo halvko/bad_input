@@ -7,6 +7,14 @@ pub struct BadInput<R: Read> {
 }
 
 impl<R: Read> BadInput<R> {
+    pub fn new(reader: R) -> Self {
+        Self {
+            reader,
+            read_buf: [0; 1024],
+            buf: Vec::new(),
+        }
+    }
+
     pub fn input(&mut self) -> InputString {
         self.try_read_line().unwrap()
     }
