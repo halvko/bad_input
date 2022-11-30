@@ -1,4 +1,4 @@
-use std::{io::Read, string::FromUtf8Error};
+use std::{any::type_name, io::Read, str::FromStr, string::FromUtf8Error};
 
 pub struct BadInput<R: Read> {
     reader: R,
@@ -92,8 +92,22 @@ impl From<FromUtf8Error> for ReadToCharError {
     }
 }
 
+#[derive(Debug)]
 pub struct InputString {
     inner: String,
+}
+
+impl InputString {
+    pub fn parse<F: FromStr>(&self) -> F {
+        let Ok(f) = self.inner.parse::<F>() else {
+            panic!("Could not parse \"{}\" to {}", self.inner, type_name::<F>());
+        };
+        f
+    }
+
+    pub fn try_parse<F: FromStr>(&self) -> Option<F> {
+        self.inner.parse::<F>().ok()
+    }
 }
 
 impl Into<String> for InputString {
