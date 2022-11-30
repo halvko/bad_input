@@ -33,7 +33,7 @@ impl<R: Read> BadInput<R> {
         // First check if we already had the character in our buffer
         for (i, c) in old_buf.iter().copied().enumerate() {
             if c == p {
-                self.buf.extend_from_slice(&old_buf[i..]);
+                self.buf.extend_from_slice(&old_buf[(i + 1)..]);
                 old_buf.truncate(i);
                 return Some(
                     String::from_utf8(old_buf)
