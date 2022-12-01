@@ -17,7 +17,7 @@ impl<R: Read> BadInput<R> {
         }
     }
 
-    pub fn input(&mut self) -> InputString {
+    pub fn line(&mut self) -> InputString {
         self.try_read_line().unwrap()
     }
 
