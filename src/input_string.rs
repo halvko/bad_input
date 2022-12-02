@@ -27,6 +27,10 @@ impl InputString {
             .try_into()
             .unwrap()
     }
+
+    pub fn as_str(&self) -> &str {
+        &self.inner
+    }
 }
 
 impl Into<String> for InputString {
