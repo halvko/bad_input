@@ -17,6 +17,16 @@ impl InputString {
     pub fn try_parse<F: FromStr>(&self) -> Option<F> {
         self.inner.parse::<F>().ok()
     }
+
+    pub fn split_n<const N: usize>(&self, p: &str) -> [String; N] {
+        self.inner
+            .split(p)
+            .map(|s| s.to_string())
+            .take(N)
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap()
+    }
 }
 
 impl Into<String> for InputString {
