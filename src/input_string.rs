@@ -18,10 +18,10 @@ impl InputString {
         self.inner.parse::<F>().ok()
     }
 
-    pub fn split_n<const N: usize>(&self, p: &str) -> [String; N] {
+    pub fn split_n<const N: usize>(&self, p: &str) -> [InputString; N] {
         self.inner
             .split(p)
-            .map(|s| s.to_string())
+            .map(|s| InputString::from(s.to_string()))
             .take(N)
             .collect::<Vec<_>>()
             .try_into()
