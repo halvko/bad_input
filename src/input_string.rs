@@ -28,6 +28,25 @@ impl InputString {
             .unwrap()
     }
 
+    pub fn destruct<const N: usize, const M: usize>(
+        &self,
+        splitters: [&str; N],
+    ) -> [InputString; M] {
+        let mut res = Vec::new();
+        let mut rest = self.as_str();
+        'outer: loop {
+            for s in &splitters {
+                if res.len() == M {
+                    break 'outer;
+                }
+                let (part, next) = rest.split_once(s).unwrap();
+                res.push(part.to_string().into());
+                rest = next;
+            }
+        }
+        res.try_into().unwrap()
+    }
+
     pub fn as_str(&self) -> &str {
         &self.inner
     }
