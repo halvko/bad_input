@@ -68,3 +68,9 @@ impl PartialEq<InputString> for String {
         *self == other.inner
     }
 }
+
+impl std::fmt::Display for InputString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.inner.fmt(f)
+    }
+}
