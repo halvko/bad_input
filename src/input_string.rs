@@ -6,6 +6,10 @@ pub struct InputString {
 }
 
 impl InputString {
+    pub fn len(&self) -> usize {
+        self.inner.len()
+    }
+
     pub fn parse<F: FromStr>(&self) -> F {
         use std::any::type_name;
         let Ok(f) = self.inner.parse::<F>() else {
@@ -18,10 +22,12 @@ impl InputString {
         self.inner.parse::<F>().ok()
     }
 
+    pub fn split<'a>(&'a self, p: &'a str) -> impl Iterator<Item = Self> + 'a {
+        self.inner.split(p).map(|s| s.to_string().into())
+    }
+
     pub fn split_n<const N: usize>(&self, p: &str) -> [InputString; N] {
-        self.inner
-            .split(p)
-            .map(|s| InputString::from(s.to_string()))
+        self.split(p)
             .take(N)
             .collect::<Vec<_>>()
             .try_into()
@@ -37,7 +43,7 @@ impl InputString {
         self.inner.chars()
     }
 
-    pub fn destruct<const N: usize, const M: usize>(
+    pub fn destruct_n<const N: usize, const M: usize>(
         &self,
         splitters: [&str; N],
     ) -> [InputString; M] {
