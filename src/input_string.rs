@@ -28,6 +28,15 @@ impl InputString {
             .unwrap()
     }
 
+    pub fn split_at(&self, n: usize) -> (InputString, InputString) {
+        let (lhs, rhs) = self.inner.split_at(n);
+        (lhs.to_string().into(), rhs.to_string().into())
+    }
+
+    pub fn chars<'a>(&'a self) -> impl Iterator<Item = char> + 'a {
+        self.inner.chars()
+    }
+
     pub fn destruct<const N: usize, const M: usize>(
         &self,
         splitters: [&str; N],
