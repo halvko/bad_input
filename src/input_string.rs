@@ -51,9 +51,11 @@ impl InputString {
         let mut rest = self.as_str();
         'outer: loop {
             for s in &splitters {
-                if res.len() == M {
+                if res.len() == (M - 1) {
+                    res.push(rest.to_string().into());
                     break 'outer;
                 }
+
                 let (part, next) = rest.split_once(s).unwrap();
                 res.push(part.to_string().into());
                 rest = next;
