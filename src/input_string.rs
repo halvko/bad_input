@@ -13,8 +13,8 @@ impl InputString {
     pub fn parse<F: FromStr>(&self) -> F {
         use std::any::type_name;
         let Ok(f) = self.inner.parse::<F>() else {
-        panic!("Could not parse \"{}\" to {}", self.inner, type_name::<F>());
-    };
+            panic!("Could not parse \"{}\" to {}", self.inner, type_name::<F>());
+        };
         f
     }
 
@@ -62,6 +62,10 @@ impl InputString {
             }
         }
         res.try_into().unwrap()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.as_str() == ""
     }
 
     pub fn as_str(&self) -> &str {
