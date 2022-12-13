@@ -71,6 +71,10 @@ impl InputString {
     pub fn as_str(&self) -> &str {
         &self.inner
     }
+
+    pub fn bytes(&self) -> &[u8] {
+        self.inner.as_bytes()
+    }
 }
 
 impl Into<String> for InputString {
