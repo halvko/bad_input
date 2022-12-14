@@ -9,6 +9,22 @@ pub struct BadInput<R: Read> {
 }
 
 impl<R: Read> BadInput<R> {
+    /// Creates a new BadInput from any reader.
+    /// # Examples
+    /// Taking input from stdin:
+    /// ```
+    /// use std::io::stdin;
+    ///
+    /// use bad_input::BadInput;
+    /// let mut input = BadInput::new(stdin());
+    /// ```
+    ///
+    /// Taking input from some other reader:
+    /// ```
+    /// use bad_input::BadInput;
+    /// let mut input = BadInput::new("Hello, world!\n".as_bytes());
+    /// assert_eq!(input.line(), "Hello, world!");
+    /// ```
     pub fn new(reader: R) -> Self {
         Self {
             reader,
