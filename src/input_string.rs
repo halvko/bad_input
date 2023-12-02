@@ -23,15 +23,24 @@ impl InputString {
     }
 
     pub fn split<'a>(&'a self, p: &'a str) -> impl Iterator<Item = Self> + 'a {
-        self.inner.split(p).map(|s| s.to_string().into())
+        self.inner.split(p).map(|s| s.into())
     }
 
+    /// Returns an array of `N` [InputString]s, with the result from `N` times splitting the input
+    /// by `p`.
+    ///
+    /// # Examples
+    /// ```
+    /// use bad_input::InputString;
+    ///
+    /// let input = InputString::from("ra la lu li");
+    /// let [fst, snd, rest] = input.split_n(" ");
+    /// assert_eq!(fst, "ra");
+    /// assert_eq!(snd, "la");
+    /// assert_eq!(rest, "lu li");
+    /// ```
     pub fn split_n<const N: usize>(&self, p: &str) -> [InputString; N] {
-        self.split(p)
-            .take(N)
-            .collect::<Vec<_>>()
-            .try_into()
-            .unwrap()
+        self.destruct_n([p])
     }
 
     pub fn split_at(&self, n: usize) -> (InputString, InputString) {
@@ -43,6 +52,25 @@ impl InputString {
         self.inner.chars()
     }
 
+    /// Splits the string by the `N` given splitters, first finding the substring before the first,
+    /// then the one between the first and the second and so on. If the output is not yet filled
+    /// after the last splitter is applied, the first one is reapplied after it, and all of the
+    /// splitters are applied again to the rest of the input. Destruct always places the rest of
+    /// the input in the last variable.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bad_input::InputString;
+    ///
+    /// let input: InputString = "a,b;c,d;e,f".into();
+    /// let [a, b, c, d, rest] = input.destruct_n([",", ";"]);
+    /// assert_eq!([a, b, c, d, rest], ["a", "b", "c", "d", "e,f"])
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// If one of the splitters could not be applied
     pub fn destruct_n<const N: usize, const M: usize>(
         &self,
         splitters: [&str; N],
@@ -86,6 +114,14 @@ impl Into<String> for InputString {
 impl From<String> for InputString {
     fn from(inner: String) -> Self {
         Self { inner }
+    }
+}
+
+impl From<&str> for InputString {
+    fn from(inner: &str) -> Self {
+        Self {
+            inner: inner.to_owned(),
+        }
     }
 }
 
