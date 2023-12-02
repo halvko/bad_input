@@ -6,12 +6,12 @@ cloning.
 # Why
 
 I write [Advent of Code](https://adventofcode.com) in Rust, and I realised that quite a bit of my
-code was input parsing and validation. This crate is my attempt of abstracting a lot of that
+code was input parsing and validation. This crate is my attempt of abstracting away a lot of that
 boilerplate.
 
 # Example
 
-The second day, first exercise of Advent of Code 2023
+The second day, first exercise of Advent of Code 2023:
 
 ```rust
 use std::io::stdin;
