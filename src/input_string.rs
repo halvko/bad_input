@@ -6,6 +6,12 @@ pub struct InputString {
 }
 
 impl InputString {
+    pub fn new() -> Self {
+        Self {
+            inner: String::new(),
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.inner.len()
     }
@@ -26,6 +32,15 @@ impl InputString {
         self.inner.split(p).map(|s| s.into())
     }
 
+    /*
+    fn split_with(
+        &'a self,
+        mut splitter: impl FnMut(&str) -> Option<(&str, &str)>,
+    ) -> impl Iterator<Item = Self> + 'a {
+        let mut rest = self.as_str();
+        std::iter::repeat_with(move || {})
+    } */
+
     /// Returns an array of `N` [InputString]s, with the result from `N` times splitting the input
     /// by `p`.
     ///
@@ -41,6 +56,10 @@ impl InputString {
     /// ```
     pub fn split_n<const N: usize>(&self, p: &str) -> [InputString; N] {
         self.destruct_n([p])
+    }
+
+    pub fn try_split_n<const N: usize>(&self, p: &str) -> Option<[InputString; N]> {
+        self.try_destruct_n([p])
     }
 
     pub fn split_at(&self, n: usize) -> (InputString, InputString) {
@@ -75,21 +94,64 @@ impl InputString {
         &self,
         splitters: [&str; N],
     ) -> [InputString; M] {
+        if splitters.is_empty() {
+            panic!("At least one splitter is neccesary")
+        }
+        let mut case = 0;
+        self.destruct_n_with(move |s| {
+            let res = splitters[case];
+            case = (case + 1) % N;
+            s.split_once(res).unwrap()
+        })
+    }
+
+    fn try_destruct_n<const N: usize, const M: usize>(
+        &self,
+        splitters: [&str; N],
+    ) -> Option<[InputString; M]> {
+        if splitters.is_empty() {
+            panic!("At least one splitter is neccesary")
+        }
+        let mut case = 0;
+        self.try_destruct_n_with(move |s| {
+            let res = splitters[case];
+            case = (case + 1) % N;
+            s.split_once(res)
+        })
+    }
+
+    fn destruct_n_with<const M: usize>(
+        &self,
+        mut splitter: impl FnMut(&str) -> (&str, &str),
+    ) -> [Self; M] {
         let mut res = Vec::new();
         let mut rest = self.as_str();
-        'outer: loop {
-            for s in &splitters {
-                if res.len() == (M - 1) {
-                    res.push(rest.to_string().into());
-                    break 'outer;
-                }
-
-                let (part, next) = rest.split_once(s).unwrap();
-                res.push(part.to_string().into());
-                rest = next;
+        loop {
+            if res.len() == (M - 1) {
+                res.push(rest.into());
+                break res.try_into().unwrap();
             }
+            let (part, next) = splitter(rest);
+            res.push(part.into());
+            rest = next
         }
-        res.try_into().unwrap()
+    }
+
+    fn try_destruct_n_with<const M: usize>(
+        &self,
+        mut splitter: impl FnMut(&str) -> Option<(&str, &str)>,
+    ) -> Option<[Self; M]> {
+        let mut res = Vec::new();
+        let mut rest = self.as_str();
+        loop {
+            if res.len() == (M - 1) {
+                res.push(rest.into());
+                break Some(res.try_into().unwrap());
+            }
+            let (part, next) = splitter(rest)?;
+            res.push(part.into());
+            rest = next
+        }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -102,6 +164,37 @@ impl InputString {
 
     pub fn bytes(&self) -> &[u8] {
         self.inner.as_bytes()
+    }
+
+    pub fn trim(&self) -> Self {
+        self.inner.trim().into()
+    }
+}
+
+impl<D: std::fmt::Display> std::ops::Add<D> for InputString {
+    type Output = InputString;
+
+    fn add(self, rhs: D) -> Self::Output {
+        format!("{self}{rhs}").into()
+    }
+}
+
+impl<D: std::fmt::Display> std::ops::AddAssign<D> for InputString {
+    fn add_assign(&mut self, rhs: D) {
+        self.inner += format!("{rhs}").as_str()
+    }
+}
+
+impl<Addable> FromIterator<Addable> for InputString
+where
+    InputString: std::ops::AddAssign<Addable>,
+{
+    fn from_iter<T: IntoIterator<Item = Addable>>(iter: T) -> Self {
+        let mut res = InputString::new();
+        for s in iter {
+            res += s
+        }
+        res
     }
 }
 
